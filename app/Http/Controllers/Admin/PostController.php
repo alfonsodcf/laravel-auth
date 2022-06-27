@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Post;
+use App\Category;
 
 class PostController extends Controller
 {
@@ -27,7 +28,8 @@ class PostController extends Controller
      */
     public function create()
     {
-        return view('admin.posts.create');
+        $categories = Category::all();
+        return view('admin.posts.create', compact('categories'));
     }
 
     /**
@@ -41,17 +43,18 @@ class PostController extends Controller
         $data = $request->all();
         $newPost = new Post();
         $newPost->title = $data['title'];
-        $slug = Str::of($data['title'])->slug("-");
         $newPost->content = $data['content'];
-        $newPost->published = isset($data['published']);
+        $newPost->published = isset($data['published']);// true o flase
+        $newPost->category_id = $data['category_id'];
+        $slug = Str::of($data['title'])->slug("-");
         $count = 1;
         while(Post::where('slug',$slug)->first()){
             $slug = Str::of($data['title'])->slug("-"). "-{$count}";
             $count++;
         }
-        $nevPost->slug = $slug;
-        $nevPost->save();
-        return redirect()->route('admin.posts.show',$nevPost->id);
+        $newPost->slug = $slug;
+        $newPost->save();
+        return redirect()->route('admin.posts.show',$newPost->id);
     }
 
     /**
